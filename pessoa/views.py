@@ -1,6 +1,9 @@
 from django.shortcuts import render, HttpResponse
+from django.http import JsonResponse
 from django.views.generic import ListView
 from django.db import IntegrityError
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from .models import Pessoa
 
@@ -37,8 +40,28 @@ def validate_post_body(body):
     
 
 class PessoaView(ListView):
-    def get(self, request, pessoa_id):
-        pessoa = Pessoa.objects.get(pessoa_id)
+    def get(self, request, pessoa_id=None):
+        if pessoa_id is None:
+            t = request.GET.get('t', None)
+            if not t:
+                return HttpResponse(status=400)
+            pessoas = Pessoa.objects.filter(
+                Q(apelido__icontains=t)|
+                Q(nome__icontains=t)|
+                Q(stack__icontains=t)
+            ).values('id', 'apelido', 'nome', 'nascimento', 'stack')
+            return JsonResponse(list(pessoas), safe=False)
+
+        pessoa = get_object_or_404(Pessoa, id=pessoa_id)
+
+        data = {
+            'id': str(pessoa.id),
+            'apelido': pessoa.apelido,
+            'nome': pessoa.nome,
+            'nascimento': pessoa.nascimento.isoformat(),
+            'stack': pessoa.stack,
+        }
+        return JsonResponse(data)
         
     def post(self, request):
         data = json.loads(request.body)
