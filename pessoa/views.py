@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponse
-from django.views import View
+from django.views.generic import ListView
 from django.db import IntegrityError
 
 from .models import Pessoa
@@ -36,9 +36,10 @@ def validate_post_body(body):
     return True
     
 
-class PessoaView(View):
-    def get(self, request):
-        return HttpResponse(content='Hello, world!')
+class PessoaView(ListView):
+    def get(self, request, pessoa_id):
+        pessoa = Pessoa.objects.get(pessoa_id)
+        
     def post(self, request):
         data = json.loads(request.body)
         valid_json = validate_post_body(data)
@@ -53,5 +54,6 @@ class PessoaView(View):
         try:
             pessoa.save()
             return HttpResponse(status=201,headers={"Location": f"/pessoas/{pessoa.pk}"})
-        except IntegrityError:
+        except IntegrityError as e:
+            print('e', e)
             return HttpResponse(status=422)
