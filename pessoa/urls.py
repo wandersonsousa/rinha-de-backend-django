@@ -1,9 +1,8 @@
 from django.urls import path
 
-from . import views
+from .views import PessoaView
 
 urlpatterns = [
-    path("", views.PessoaView.as_view()),
-    path("<uuid:pessoa_id>/", views.PessoaView.as_view()),
-    path("contagem-pessoas/", views.PessoaContagemView.as_view())
+    path("", PessoaView.as_view()),
+    path("<uuid:pessoa_id>/", PessoaView.as_view()),
 ]
