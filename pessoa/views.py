@@ -38,7 +38,10 @@ def validate_post_body(body):
 
     return True
     
-
+class PessoaContagemView(ListView):
+    def get(self, request):
+        return HttpResponse(Pessoa.objects.count())
+    
 class PessoaView(ListView):
     def get(self, request, pessoa_id=None):
         if pessoa_id is None:
