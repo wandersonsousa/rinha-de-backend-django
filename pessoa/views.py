@@ -11,16 +11,12 @@ import json
 
 def validate_post_body(body):
     if not body['apelido'] or not body['nome'] or not body['nascimento']:
-        print('Missing field')
         return False
     if type(body['apelido']) is not str or not len(body['apelido']) or len(body['apelido']) > 32:
-        print('field apelido')
         return False
     if type(body['nome']) is not str or not len(body['nome']) or len(body['apelido']) > 100:
-        print('field nome')
         return False
     if type(body['nascimento']) is not str or not len(body['nascimento']) or len(body['nascimento']) != 10:
-        print('field nascimento')
         return False
     
     ano, mes, dia = body['nascimento'].split('-')
