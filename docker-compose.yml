@@ -32,7 +32,7 @@ services:
       - api1
       - api2
     ports:
-      - "9999:9999"
+      - "80:80"
   db:
    image: postgres
    ports:
