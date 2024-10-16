@@ -37,7 +37,7 @@ services:
       - api1
       - api2
     ports:
-      - "80:80"
+      - "9999:9999"
     deploy:
       resources:
         limits:
