@@ -3,8 +3,6 @@ services:
       build: .
       hostname: api1
       command: python manage.py runserver 0.0.0.0:8000
-      volumes:
-        - ./:/app
       expose:
         - "8000"
       depends_on:
@@ -15,8 +13,6 @@ services:
       build: .
       hostname: api2
       command: python manage.py runserver 0.0.0.0:8000
-      volumes:
-        - ./:/app
       expose:
         - "8000"
       depends_on:
