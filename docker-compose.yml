@@ -2,7 +2,7 @@ services:
   api1:
       build: .
       hostname: api1
-      command: python manage.py runserver 0.0.0.0:8000
+      command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3
       expose:
         - "8000"
       depends_on:
@@ -12,7 +12,7 @@ services:
   api2:
       build: .
       hostname: api2
-      command: python manage.py runserver 0.0.0.0:8000
+      command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3
       expose:
         - "8000"
       depends_on:
