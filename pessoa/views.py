@@ -76,5 +76,5 @@ class PessoaView(ListView):
         try:
             pessoa.save()
             return HttpResponse(status=201,headers={"Location": f"/pessoas/{pessoa.pk}"})
-        except IntegrityError as e:
+        except Exception as e:
             return HttpResponse(status=422)
