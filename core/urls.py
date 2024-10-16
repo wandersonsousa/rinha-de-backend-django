@@ -20,6 +20,6 @@ from pessoa.views import PessoaContagemView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('pessoas/', include('pessoa.urls')),
-    path("contagem-pessoas/", PessoaContagemView.as_view())
+    path('pessoas', include('pessoa.urls')),
+    path("contagem-pessoas", PessoaContagemView.as_view())
 ]
