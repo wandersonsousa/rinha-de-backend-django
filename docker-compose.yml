@@ -2,13 +2,16 @@ services:
   api1:
       build: .
       hostname: api1
-      command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3
+      command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --threads=2 --workers 1
+      networks:
+        - db-network
       expose:
         - "8000"
       depends_on:
         - db
+        - pgbouncer
       environment:
-        - DATABASE_URL=postgres://postgres:1234@db:5432/postgres
+        - DATABASE_URL=postgres://postgres:1234@pgbouncer:6432/postgres?sslmode=disable
       deploy:
         resources:
           limits:
@@ -17,13 +20,16 @@ services:
   api2:
       build: .
       hostname: api2
-      command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3
+      command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --threads=2 --workers 1
+      networks:
+        - db-network
       expose:
         - "8000"
       depends_on:
         - db
+        - pgbouncer
       environment:
-        - DATABASE_URL=postgres://postgres:1234@db:5432/postgres
+        - DATABASE_URL=postgres://postgres:1234@pgbouncer:6432/postgres?sslmode=disable
       deploy:
         resources:
           limits:
@@ -38,15 +44,22 @@ services:
       - api2
     ports:
       - "9999:9999"
+    networks:
+      - db-network
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: '0.5GB'
+          cpus: '0.3'
+          memory: '0.3GB'
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
   db:
    image: postgres
-   ports:
-      - "5432:5432"
+   command: postgres -c shared_buffers=378MB -c max_connections=100
+   networks:
+      - db-network
    environment:
       - "POSTGRES_DB=postgres" 
       - "POSTGRES_USER=postgres" 
@@ -54,7 +67,31 @@ services:
    deploy:
       resources:
         limits:
-          cpus: '0.75'
+          cpus: '0.5'
           memory: '1.5GB'
+  pgbouncer:
+    image: edoburu/pgbouncer:v1.23.1-p1
+    depends_on:
+      - db
+    ports:
+      - 5432:6432
+    networks:
+      - db-network
+    volumes:
+      - ./pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+      - ./userlist.txt:/etc/pgbouncer/userlist.txt
+    environment:
+      - DATABASE_URL=postgres://postgres:1234@db:5432/postgres
+      - POOL_MODE=transaction  
+      - MAX_DB_CONNECTIONS=100  
+      - DEFAULT_POOL_SIZE=40  
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '0.2GB'
+networks:
+  db-network:
+    driver: bridge
 volumes:
   postgres_data:

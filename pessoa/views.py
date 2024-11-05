@@ -14,7 +14,7 @@ def validate_post_body(body):
         return False
     if type(body['apelido']) is not str or not len(body['apelido']) or len(body['apelido']) > 32:
         return False
-    if type(body['nome']) is not str or not len(body['nome']) or len(body['apelido']) > 100:
+    if type(body['nome']) is not str or not len(body['nome']) or len(body['nome']) > 100:
         return False
     if type(body['nascimento']) is not str or not len(body['nascimento']) or len(body['nascimento']) != 10:
         return False
@@ -28,6 +28,8 @@ def validate_post_body(body):
         return False
     
     if body['stack']:
+        if(not isinstance(body['stack'], list)):
+            return False
         for tech in body['stack']:
             if type(tech) is not str or len(tech) > 32:
                 return False 
